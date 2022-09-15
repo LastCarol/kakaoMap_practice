@@ -22,20 +22,24 @@ const MapContainer = ({ searchPlace }) => {
         const map = new kakao.maps.Map(container, options);
         const ps = new kakao.maps.services.Places(map);
         
-        ps.categorySearch('CS2', placesSearchCB, {useMapBounds:true});
+        if(!searchPlace){
+            ps.categorySearch('CS2', placesSearchCB, {useMapBounds:true});
+            console.log(searchPlace)
+        }else{
+            ps.keywordSearch(searchPlace, placesSearchCB)
+            console.log(searchPlace)
+        }
 
 
         function placesSearchCB(data, status, pagination) {
             if (status === kakao.maps.services.Status.OK) {
-                for (let i = 0; i < data.length; i++) {
+                let bounds = new kakao.maps.LatLngBounds()
+                for (let i = 0; i < data.length; i++) {                    
                     displayMarker(data[i]);
-
-
-                 //   let bounds = new kakao.maps.LatLngBounds()
-                // bounds.extend(new kakao.maps.LatLng(data[i].y, data[i].x))
+                    bounds.extend(new kakao.maps.LatLng(data[i].y, data[i].x))
               }
       
-            //   map.setBounds(bounds)
+              map.setBounds(bounds)
               // 페이지 목록 보여주는 displayPagination() 추가
               displayPagination(pagination)
               setPlaces(data)
@@ -84,7 +88,7 @@ const MapContainer = ({ searchPlace }) => {
       }
           }
     })
-  }, [])
+  }, [searchPlace])
 
   return (
     <div>
